@@ -25,7 +25,8 @@ class UserSerializer(serializers.ModelSerializer):
         instance.is_host = validated_data.get('is_host', instance.is_host)
         instance.is_renter = validated_data.get('is_renter', instance.is_renter)
 
-        
+        #password = ''
+        #if(validated_data.pop('password')):
         password = validated_data.pop('password')
         instance.set_password(password)
 
