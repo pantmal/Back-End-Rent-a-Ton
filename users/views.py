@@ -15,26 +15,29 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
-    def get_permissions(self):
-        """
-        Instantiates and returns the list of permissions that this view requires.
-        """
+    #def get_permissions(self):
+    #    """
+    #    Instantiates and returns the list of permissions that this view requires.
+    #    """
     
-        permission_classes = [AllowAny]
-        return [permission() for permission in permission_classes]
+    #    permission_classes = [AllowAny]
+    #    return [permission() for permission in permission_classes]
 
 
 class approveUser(APIView):
 
-    permissions = [AllowAny]
+    #permissions = [AllowAny]
 
     #@csrf_exempt #this SHOULD be temp
     def post(self, request, format=None):
-        response_id = request.data['ID']
+        
         response_act = request.data['activation']
 
+        response_id = request.data['ID']
         user = CustomUser.objects.get(pk=response_id)
-        user.approved = response_act
+
+        if user.is_host == True:
+            user.approved = response_act
         
         user.save()
 
