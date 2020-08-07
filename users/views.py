@@ -5,7 +5,7 @@ from .models import CustomUser
 from .serializers import UserSerializer
 
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from django.views.decorators.csrf import csrf_exempt
@@ -15,20 +15,25 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
-    #def get_permissions(self):
-    #    """
-    #    Instantiates and returns the list of permissions that this view requires.
-    #    """
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
     
-    #    permission_classes = [AllowAny]
-    #    return [permission() for permission in permission_classes]
+        permission_classes = []
+        if self.action == 'list' or self.action == 'retrieve' or self.action=='create':
+            permission_classes = [AllowAny]
+        if self.action == 'update' or self.action == 'partial_update':
+            permission_classes = [IsAdminUser|IsAuthenticated]
+        if self.action == 'destroy':
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
 
 
 class approveUser(APIView):
 
-    #permissions = [AllowAny]
+    permission_classes = [IsAdminUser]
 
-    #@csrf_exempt #this SHOULD be temp
     def post(self, request, format=None):
         
         response_act = request.data['activation']
