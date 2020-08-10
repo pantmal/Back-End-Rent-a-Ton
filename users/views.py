@@ -8,7 +8,6 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 class UserViewSet(viewsets.ModelViewSet):

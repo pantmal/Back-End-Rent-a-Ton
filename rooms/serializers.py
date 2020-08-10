@@ -1,0 +1,48 @@
+from rest_framework import serializers
+from .models import *
+
+
+class RoomSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Room
+        fields = ['pk', 'name', 'geolocation', 'street', 'neighborhood', 'transit', 'start_date', 'end_date', 
+        'price', 'price_per_person', 'max_people', 'beds', 'bedrooms', 'bathrooms', 'rep_photo', 'room_type',
+        'has_wifi', 'has_heating', 'has_freezer', 'has_kitchen', 'has_TV', 'has_parking', 'has_elevator',
+        'has_living_room', 'square_feet', 'description', 'smoking', 'pets', 'events', 'minimum_nights',
+        'host_id', 'reserved' 
+        ]
+        
+class RoomImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RoomImage
+        fields = ['pk', 'room_id_img', 'picture']
+
+
+class RoomRatingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RoomRating
+        fields = ['pk', 'room_id_rate', 'renter_id_rate', 'date', 'rating']
+
+
+class HostRatingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = HostRating
+        fields = ['pk', 'host_id_hostRate', 'renter_id_hostRate', 'date', 'rating']
+
+
+class ReservationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Reservation
+        fields = ['pk', 'room_id_res', 'renter_id_res', 'start_date', 'end_date', 'price']
+
+
+class ClickedItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ClickedItem
+        fields = ['pk', 'room_id_click', 'renter_id_click']
