@@ -6,14 +6,14 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Room(models.Model):
 
-    PRIV = "PRIVATE ROOM"
-    SHARE = "SHARED ROOM"
-    ENTIRE = "ENTIRE HOUSE"
+    PRIV = "Private room"
+    SHARE = "Shared room"
+    ENTIRE = "Entire home/apt"
     
     ROOM_CHOICES = (
-        (PRIV, "Private room"),
-        (SHARE, "Shared room"),
-        (ENTIRE, "Entire home/apt")
+        (PRIV, "PRIVATE ROOM"),
+        (SHARE, "SHARED ROOM"),
+        (ENTIRE, "ENTIRE HOUSE")
     )
 
     name = models.CharField(max_length=50, null=False)
@@ -21,8 +21,8 @@ class Room(models.Model):
     street = models.CharField(max_length=100, null=False)
     neighborhood = models.CharField(max_length=50, null=False)
     transit = models.CharField(max_length=500, null=False)
-    start_date = models.DateTimeField(null=False)
-    end_date = models.DateTimeField(null=False)
+    start_date = models.DateField(null=False)
+    end_date = models.DateField(null=False)
     price = models.FloatField(null=False)
     price_per_person = models.FloatField(null=False)
     max_people = models.IntegerField()

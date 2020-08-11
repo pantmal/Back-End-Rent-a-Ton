@@ -13,8 +13,10 @@ router.register(r'hostRatings', HostRatingViewSet)
 router.register(r'reservations', ReservationViewSet)
 router.register(r'clickedItems', ClickedItemViewSet)
 
+searchView = SearchRooms.as_view()
 
 urlpatterns = [
 
     path(r'', include(router.urls)),
+    path('search/', searchView, name='search-rooms')
 ] 
