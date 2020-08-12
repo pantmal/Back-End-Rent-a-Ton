@@ -138,12 +138,13 @@ class SearchRooms(APIView):
         price_check = False
 
         for room in rooms:
-            total_price = room.price + ((room.max_people-1) * room.price_per_person)
+            request_ppl = int(request.data['people'])
+            total_price = room.price + ((request_ppl-1) * room.price_per_person)
 
             if 'max_price' in parameters:
                 if 'max_price' != '':
-                    request_price = int(request.data['max_price'])
-                    if request_price <= total_price:
+                    request_price = int(request.data['max_price']) #CHANGE TO FLOAT SOMETIME
+                    if total_price <= request_price:
                         price_check = True
                     else:
                         price_check = False
@@ -174,7 +175,7 @@ class SearchRooms(APIView):
             if loc_check == False:
                 continue
 
-            request_ppl = int(request.data['people'])
+            
             if request_ppl <= room.max_people:
                 ppl_check = True
             
