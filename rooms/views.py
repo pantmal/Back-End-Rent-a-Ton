@@ -91,12 +91,67 @@ class SearchRooms(APIView):
 
         rooms_to_return = []
 
+
+        rooms = rooms.filter(neighborhood=request.data['hood'])
+
+        if 'room_type' in parameters:
+            if 'room_type' != '':
+                if request.data['room_type'] == 'Private_room':
+                    rooms = rooms.filter(room_type='Private room')
+                if request.data['room_type'] == 'Shared_room':
+                    rooms = rooms.filter(room_type='Shared room')
+                if request.data['room_type'] == 'Entire_home/apt':
+                    rooms = rooms.filter(room_type='Entire home/apt')
+
+        
+        if 'wifi' in parameters:
+            if request.data['wifi'] == 'true':
+                rooms = rooms.filter(has_wifi=True)
+
+        if 'freezer' in parameters:
+            if request.data['freezer'] == 'true':
+                rooms = rooms.filter(has_freezer=True)
+
+        if 'heating' in parameters:
+            if request.data['heating'] == 'true':
+                rooms = rooms.filter(has_heating=True)
+
+        if 'kitchen' in parameters:
+            if request.data['kitchen'] == 'true':
+                rooms = rooms.filter(has_kitchen=True)
+
+        if 'TV' in parameters:
+            if request.data['TV'] == 'true':
+                rooms = rooms.filter(has_TV=True)
+
+        if 'parking' in parameters:
+            if request.data['parking'] == 'true':
+                rooms = rooms.filter(has_parking=True)
+
+        if 'elevator' in parameters:
+            if request.data['elevator'] == 'true':
+                rooms = rooms.filter(has_elevator=True)
+
         date_check = False
-        hood_check = False
         loc_check = False
         ppl_check = False
+        price_check = False
 
         for room in rooms:
+            total_price = room.price + ((room.max_people-1) * room.price_per_person)
+
+            if 'max_price' in parameters:
+                if 'max_price' != '':
+                    request_price = int(request.data['max_price'])
+                    if request_price <= total_price:
+                        price_check = True
+                    else:
+                        price_check = False
+                else:
+                    price_check = True
+            else:
+                price_check = True
+
             if room.reserved == False:
                 request_s_date = request.data['s_date']
                 request_s_date = datetime.datetime.strptime(request_s_date, "%Y-%m-%d").date()
@@ -111,11 +166,6 @@ class SearchRooms(APIView):
             if date_check == False:
                 continue
 
-            if room.neighborhood == request.data['hood']:
-                hood_check = True
-
-            if hood_check == False:
-                continue
             
             if request.data['city'] in room.street:
                 if request.data['country'] in room.street:
@@ -131,7 +181,7 @@ class SearchRooms(APIView):
             if ppl_check == False:
                 continue
 
-            if date_check == True and hood_check == True and loc_check == True and ppl_check == True:
+            if date_check == True and loc_check == True and ppl_check == True and price_check == True:
                 rooms_to_return.append(room)
 
             print(rooms_to_return)
