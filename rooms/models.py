@@ -20,6 +20,8 @@ class Room(models.Model):
     geolocation = models.PointField(null=False)
     street = models.CharField(max_length=100, null=False)
     neighborhood = models.CharField(max_length=50, null=False)
+    city = models.CharField(max_length=50, null=False)
+    country = models.CharField(max_length=50, null=False)
     transit = models.CharField(max_length=500, null=False)
     start_date = models.DateField(null=False)
     end_date = models.DateField(null=False)

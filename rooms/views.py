@@ -93,6 +93,8 @@ class SearchRooms(APIView):
 
 
         rooms = rooms.filter(neighborhood=request.data['hood'])
+        rooms = rooms.filter(city=request.data['city'])
+        rooms = rooms.filter(country=request.data['country'])
 
         if 'room_type' in parameters:
             if 'room_type' != '':
@@ -133,7 +135,6 @@ class SearchRooms(APIView):
                 rooms = rooms.filter(has_elevator=True)
 
         date_check = False
-        loc_check = False
         ppl_check = False
         price_check = False
 
@@ -168,21 +169,13 @@ class SearchRooms(APIView):
                 continue
 
             
-            if request.data['city'] in room.street:
-                if request.data['country'] in room.street:
-                    loc_check = True
-
-            if loc_check == False:
-                continue
-
-            
             if request_ppl <= room.max_people:
                 ppl_check = True
             
             if ppl_check == False:
                 continue
 
-            if date_check == True and loc_check == True and ppl_check == True and price_check == True:
+            if date_check == True and ppl_check == True and price_check == True:
                 rooms_to_return.append(room)
 
             print(rooms_to_return)

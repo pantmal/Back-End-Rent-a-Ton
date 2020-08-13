@@ -6,7 +6,7 @@ class RoomSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Room
-        fields = ['pk', 'name', 'geolocation', 'street', 'neighborhood', 'transit', 'start_date', 'end_date', 
+        fields = ['pk', 'name', 'geolocation', 'street', 'neighborhood','city','country', 'transit', 'start_date', 'end_date', 
         'price', 'price_per_person', 'max_people', 'beds', 'bedrooms', 'bathrooms', 'rep_photo', 'room_type',
         'has_wifi', 'has_heating', 'has_freezer', 'has_kitchen', 'has_TV', 'has_parking', 'has_elevator',
         'has_living_room', 'square_feet', 'description', 'smoking', 'pets', 'events', 'minimum_nights',
