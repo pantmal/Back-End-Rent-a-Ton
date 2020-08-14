@@ -91,6 +91,17 @@ class SearchRooms(APIView):
 
         rooms_to_return = []
 
+        print('ANYTHING')
+        if 'host_id' in parameters:
+
+            rooms = rooms.filter(host_id=request.data['host_id'])
+            rooms_to_return = rooms
+            if not rooms_to_return:
+                return Response('not found')
+            else:
+                roomSerializer = RoomSerializer(rooms_to_return, many=True)
+                return Response(roomSerializer.data)
+
 
         rooms = rooms.filter(neighborhood=request.data['hood'])
         rooms = rooms.filter(city=request.data['city'])
