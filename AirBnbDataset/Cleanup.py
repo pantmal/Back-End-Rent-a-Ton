@@ -4,6 +4,7 @@ import os
 import numpy as np
 
 df_listings=pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/listings.csv' )
+df_calendar=pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/calendar.csv' )
 
 #keep the columns we need
 df_listings=df_listings[['id','name','latitude','longitude','street', 'neighbourhood','transit','price','extra_people',
@@ -23,6 +24,8 @@ df_listings['has_living_room']=False
 df_listings['smoking']=False
 df_listings['pets']=False
 df_listings['events']=False
+df_listings['reserved']=False
+
 
 #make lists into strings without whitespaces
 df_listings['amenities']=df_listings['amenities'].apply(', '.join)
@@ -31,7 +34,7 @@ df_listings['amenities']=df_listings['amenities'] = df_listings['amenities'].str
 
 #convert the description column to string(normally includes integers and floats)
 df_listings['description']=df_listings['description'].astype(str)
-
+#df_listings['summary']=df_listings['summary'].astype(str)
 
 #fill the extra columns with True/False values
 for row in range(0,len(df_listings)):
@@ -60,10 +63,15 @@ for row in range(0,len(df_listings)):
         df_listings.at[row,'events']=True
 
         
+
+
+        
 #replace NaN values with 0.0 -transit gets filled with null
 df_listings.fillna(df_listings.dtypes.replace({'float64': 0.0, 'O': 'NULL'}), inplace=True)        
         
     
+
+
 #calculate max of some columns to fill the missing data
 square_feet_value=df_listings['square_feet'].max()
 bathrooms_value=df_listings['bathrooms'].max()
@@ -75,6 +83,8 @@ neighbourhood_list=df_listings['neighbourhood'].unique()
 neighbourhood_list_len=len(neighbourhood_list)
 transit_list=df_listings['transit'].unique()
 transit_list_len=len(transit_list)
+
+
 
 #chagne 0 values to sth useful
 #also fill in the neighbourhood and transit columns
@@ -92,13 +102,33 @@ for row in range(0,len(df_listings)):
     if df_listings.loc[row,'transit']=="NULL":
         df_listings.at[row,'transit']=transit_list[np.random.randint(3, transit_list_len)]    
 
-
-#print(df_listings['host_id'].nunique())      
+#count the unique host id values
+print(df_listings['host_id'].nunique())      
 # df_listings['square_feet']=df_listings['square_feet'].astype(float)
 df_listings=df_listings.dropna()
 # with pd.option_context('display.max_rows', None, 'display.max_columns', None): 
 #     print(df_listings)
 
-df_listings = df_listings.drop(columns=['amenities'])
 
-df_listings.to_csv('/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/new_listings.csv')
+#drop the NaN values(there arent any used for testing purposes-does nothing)
+df_listings.isna().any() 
+
+#df_listings['price'].tail(255)
+    ######print the whole df
+# with pd.option_context('display.max_rows', None, 'display.max_columns', None): 
+#     print(df_listings['events'])
+    #####check which columns have null values
+    ######print one full line of description
+    
+    
+#convert dates to the correct type    
+df_calendar['date'] = pd.to_datetime(df_calendar['date'])
+#create the dataframe we need(we save the first and last value for each of the unique ids)
+df_temp=df_calendar.groupby('listing_id')['date'].agg(['first','last'])
+#now we need to merge the two dfs into a single one
+df_final = df_listings.merge(df_temp, how='inner', left_on='id', right_on='listing_id')
+
+
+df_final = df_final.drop(columns=['amenities'])
+
+df_final.to_csv('/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/new_listings.csv')

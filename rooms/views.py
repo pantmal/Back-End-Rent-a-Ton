@@ -91,7 +91,6 @@ class SearchRooms(APIView):
 
         rooms_to_return = []
 
-        print('ANYTHING')
         if 'host_id' in parameters:
 
             rooms = rooms.filter(host_id=request.data['host_id'])
@@ -196,3 +195,24 @@ class SearchRooms(APIView):
         else:
             roomSerializer = RoomSerializer(rooms_to_return, many=True)
             return Response(roomSerializer.data)
+
+class GetImages(APIView):
+
+    permission_classes = [AllowAny]
+
+    def post(self, request, format=None):
+
+        parameters = request.data.keys()
+        
+        images = RoomImage.objects.all()
+
+        imgs_to_return = []
+        print(request.data['room_id_img'])
+        images = images.filter(room_id_img=request.data['room_id_img'])
+        imgs_to_return = images
+        if not imgs_to_return:
+            return Response('not found')
+        else:
+            roomImageSerializer = RoomImageSerializer(imgs_to_return, many=True)
+            return Response(roomImageSerializer.data)
+

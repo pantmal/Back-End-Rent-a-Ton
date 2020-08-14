@@ -14,9 +14,11 @@ router.register(r'reservations', ReservationViewSet)
 router.register(r'clickedItems', ClickedItemViewSet)
 
 searchView = SearchRooms.as_view()
+getImagesView = GetImages.as_view()
 
 urlpatterns = [
 
     path(r'', include(router.urls)),
-    path('search/', searchView, name='search-rooms')
+    path('search/', searchView, name='search-rooms'),
+    path('getImages/', getImagesView, name='get-images')
 ] 
