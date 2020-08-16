@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.views import APIView
+from django.db.models import Avg
 from .models import *
 from .serializers import *
 from users.models import *
@@ -115,7 +116,7 @@ class SearchRooms(APIView):
 
         if 'renter_id' in parameters:
 
-            reservations = Reservation.objects.filter(renter_id_res=request.data['user_id'])
+            reservations = Reservation.objects.filter(renter_id_res=request.data['renter_id'])
 
             roomss = []
             for res in reservations:
@@ -220,7 +221,7 @@ class SearchRooms(APIView):
         else:
             final_rooms = rooms
         
-        
+    
         rooms_to_return = final_rooms
         print(rooms_to_return)
         
@@ -310,3 +311,55 @@ class ReservationCheck(APIView):
         else:
             return Response('free')
 
+class RatingCheck(APIView):       
+
+    permission_classes = [AllowAny]
+
+    def post(self, request, format=None):
+
+        parameters = request.data.keys()    
+
+        room_id = request.data['room_id']
+        user_id = request.data['user_id']
+        date_now = request.data['date_now']
+        
+        case = Reservation.objects.filter(room_id_res=room_id, renter_id_res=user_id, end_date__lt=date_now).exists()
+
+        if case:
+            return Response('free')
+        else:
+            return Response('bounded')
+
+class RatingCount(APIView):       
+
+    permission_classes = [AllowAny]
+
+    def post(self, request, format=None):
+
+        parameters = request.data.keys()                
+
+        room_id = ''
+        if 'room' in parameters:
+            room_id = request.data['room_id']
+
+            count = len(RoomRating.objects.filter(room_id_rate=room_id))
+            avg = RoomRating.objects.filter(room_id_rate=room_id).aggregate(Avg('rating'))
+
+            print(count)
+            print(avg)
+
+            return Response({'count':count,'avg':avg})
+
+        host_id = ''
+        if 'host' in parameters:
+            host_id = request.data['host_id']
+
+            count = len(HostRating.objects.filter(host_id_hostRate=host_id))
+            avg = HostRating.objects.filter(host_id_hostRate=host_id).aggregate(Avg('rating'))
+
+            print(count)
+            print(avg)
+
+            return Response({'count':count,'avg':avg})
+
+        return Response('something went wrong')

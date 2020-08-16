@@ -60,7 +60,7 @@ class RoomRating(models.Model):
 
     room_id_rate = models.ForeignKey(Room, related_name='room_rate', on_delete=models.CASCADE, null=False)
     renter_id_rate = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_rate', on_delete=models.CASCADE, null=False)
-    date = models.DateTimeField(null=False)
+    date = models.DateField(null=False)
     rating = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
 
 

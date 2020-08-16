@@ -19,6 +19,8 @@ searchView = SearchRooms.as_view()
 getImagesView = GetImages.as_view()
 addSearchesClicks = AddSearchesClicks.as_view()
 resCheck = ReservationCheck.as_view()
+ratCheck = RatingCheck.as_view()
+ratCount = RatingCount.as_view()
 
 urlpatterns = [
 
@@ -26,5 +28,7 @@ urlpatterns = [
     path('search/', searchView, name='search-rooms'),
     path('getImages/', getImagesView, name='get-images'),
     path('addSearchesClicks/', addSearchesClicks, name='add-searches-clicks'),
-    path('resCheck/', resCheck, name='res-check')
+    path('resCheck/', resCheck, name='res-check'),
+    path('ratCheck/', ratCheck, name='rat-check'),
+    path('ratCount/', ratCount, name='rat-check')
 ] 
