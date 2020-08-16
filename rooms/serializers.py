@@ -38,7 +38,7 @@ class ReservationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reservation
-        fields = ['pk', 'room_id_res', 'renter_id_res', 'start_date', 'end_date', 'price']
+        fields = ['pk', 'room_id_res', 'renter_id_res', 'start_date', 'end_date']
 
 
 class ClickedItemSerializer(serializers.ModelSerializer):
@@ -46,3 +46,9 @@ class ClickedItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClickedItem
         fields = ['pk', 'room_id_click', 'renter_id_click']
+
+class SearchedItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SearchedItem
+        fields = ['pk', 'room_id_search', 'renter_id_search']

@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from .models import *
 from .serializers import *
+from users.models import *
 
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
@@ -78,6 +79,17 @@ class ClickedItemViewSet(viewsets.ModelViewSet):
         permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]        
 
+class SearchedItemViewSet(viewsets.ModelViewSet):
+    queryset = SearchedItem.objects.all()
+    serializer_class = SearchedItemSerializer
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]        
+
 
 class SearchRooms(APIView):
 
@@ -101,6 +113,23 @@ class SearchRooms(APIView):
                 roomSerializer = RoomSerializer(rooms_to_return, many=True)
                 return Response(roomSerializer.data)
 
+        if 'renter_id' in parameters:
+
+            reservations = Reservation.objects.filter(renter_id_res=request.data['user_id'])
+
+            roomss = []
+            for res in reservations:
+                roomss.append(res.room_id_res)
+
+            rooms_to_return = roomss
+            if not rooms_to_return:
+                return Response('not found')
+            else:
+                roomSerializer = RoomSerializer(rooms_to_return, many=True)
+                return Response(roomSerializer.data)
+
+        print(request.data['user_id'])
+        rooms = rooms.exclude(host_id=request.data['user_id'])
 
         rooms = rooms.filter(neighborhood=request.data['hood'])
         rooms = rooms.filter(city=request.data['city'])
@@ -144,52 +173,58 @@ class SearchRooms(APIView):
             if request.data['elevator'] == 'true':
                 rooms = rooms.filter(has_elevator=True)
 
+
+        request_ppl = int(request.data['people'])
+        rooms = rooms.filter(max_people__gte=request_ppl)
+
         date_check = False
-        ppl_check = False
-        price_check = False
+        
+        request_s_date = request.data['s_date']
+        request_s_date = datetime.datetime.strptime(request_s_date, "%Y-%m-%d").date()
 
-        for room in rooms:
-            request_ppl = int(request.data['people'])
-            total_price = room.price + ((request_ppl-1) * room.price_per_person)
+        request_e_date = request.data['e_date']
+        request_e_date = datetime.datetime.strptime(request_e_date, "%Y-%m-%d").date()
+        case = rooms.filter(start_date__lte=request_s_date, end_date__gte=request_e_date).exists()
+        
+        if case==True:
+            rooms = rooms.filter(start_date__lte=request_s_date, end_date__gte=request_e_date)
+            
+            for room in rooms:
+                case_1 = Reservation.objects.filter(room_id_res=room.id, start_date__lte=request_s_date, end_date__gte=request_s_date).exists()
+                if case_1:
+                    rooms = rooms.exclude(pk=room.id)    
 
-            if 'max_price' in parameters:
-                if 'max_price' != '':
+                case_2 = Reservation.objects.filter(room_id_res=room.id, start_date__lte=request_e_date, end_date__gte=request_e_date).exists()
+                if case_2:
+                    rooms = rooms.exclude(pk=room.id)    
+
+                case_3 = Reservation.objects.filter(room_id_res=room.id, start_date__gte=request_s_date, end_date__lte=request_e_date).exists()
+                if case_3:
+                    rooms = rooms.exclude(pk=room.id)    
+            
+
+        rooms_to_return = []
+        final_rooms = []
+        
+        if 'max_price' in parameters:
+            if 'max_price' != '':
+
+                for room in rooms:
+                
+                    total_price = room.price + ((request_ppl-1) * room.price_per_person)
                     request_price = int(request.data['max_price']) #CHANGE TO FLOAT SOMETIME
                     if total_price <= request_price:
-                        price_check = True
-                    else:
-                        price_check = False
-                else:
-                    price_check = True
+                        final_rooms.append(room)    
             else:
-                price_check = True
-
-            if room.reserved == False:
-                request_s_date = request.data['s_date']
-                request_s_date = datetime.datetime.strptime(request_s_date, "%Y-%m-%d").date()
-
-                request_e_date = request.data['e_date']
-                request_e_date = datetime.datetime.strptime(request_e_date, "%Y-%m-%d").date()
-                
-                if room.start_date <= request_s_date <= room.end_date:
-                    if room.start_date <= request_e_date <= room.end_date:
-                        date_check = True
-
-            if date_check == False:
-                continue
-
-            
-            if request_ppl <= room.max_people:
-                ppl_check = True
-            
-            if ppl_check == False:
-                continue
-
-            if date_check == True and ppl_check == True and price_check == True:
-                rooms_to_return.append(room)
-
-            print(rooms_to_return)
+                final_rooms = rooms    
+        else:
+            final_rooms = rooms
         
+        
+        rooms_to_return = final_rooms
+        print(rooms_to_return)
+        
+
         if not rooms_to_return:
             return Response('not found')
         else:
@@ -207,7 +242,7 @@ class GetImages(APIView):
         images = RoomImage.objects.all()
 
         imgs_to_return = []
-        print(request.data['room_id_img'])
+        
         images = images.filter(room_id_img=request.data['room_id_img'])
         imgs_to_return = images
         if not imgs_to_return:
@@ -215,4 +250,63 @@ class GetImages(APIView):
         else:
             roomImageSerializer = RoomImageSerializer(imgs_to_return, many=True)
             return Response(roomImageSerializer.data)
+
+class AddSearchesClicks(APIView):
+
+    permission_classes = [AllowAny]
+
+    def post(self, request, format=None):
+
+        parameters = request.data.keys()
+        
+        searches = []
+        clicks = []
+        already_there = False
+        if 'search' in parameters:
+            searches = SearchedItem.objects.all()
+            case1 = searches.filter(room_id_search=request.data['room_id_search']).exists()
+            case2 = searches.filter(renter_id_search=request.data['renter_id_search']).exists()
+            if case1 and case2:
+                already_there = True
+        if 'click' in parameters:
+            clicks = ClickedItem.objects.all()
+            case1 = clicks.filter(room_id_click=request.data['room_id_click']).exists()
+            case2 = clicks.filter(renter_id_click=request.data['renter_id_click']).exists()
+            if case1 and case2:
+                already_there = True
+
+        if already_there == False:
+            if 'search' in parameters:
+                search = SearchedItem(room_id_search=Room.objects.get(pk=request.data['room_id_search']),renter_id_search=CustomUser.objects.get(pk=request.data['renter_id_search']) )
+                search.save()
+            if 'click' in parameters:
+                click = ClickedItem(room_id_click=Room.objects.get(pk=request.data['room_id_click']),renter_id_click=CustomUser.objects.get(pk=request.data['renter_id_click']))
+                click.save()
+
+        return Response('ok')
+        
+class ReservationCheck(APIView):       
+
+    permission_classes = [AllowAny]
+
+    def post(self, request, format=None):
+
+        parameters = request.data.keys()    
+       
+        check_in = request.data['start_date'] 
+        check_out = request.data['end_date']
+
+        # check wether the dates are valid
+        # case 1: a room is booked before the check_in date, and checks out after the requested check_in date
+        case_1 = Reservation.objects.filter(room_id_res=request.data['room_id'], start_date__lte=check_in, end_date__gte=check_in).exists()
+
+        # case 2: a room is booked before the requested check_out date and check_out date is after requested check_out date
+        case_2 = Reservation.objects.filter(room_id_res=request.data['room_id'], start_date__lte=check_out, end_date__gte=check_out).exists()
+        
+        case_3 = Reservation.objects.filter(room_id_res=request.data['room_id'], start_date__gte=check_in, end_date__lte=check_out).exists()
+
+        if case_1 or case_2 or case_3:
+            return Response('taken')
+        else:
+            return Response('free')
 

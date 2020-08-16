@@ -68,21 +68,23 @@ class HostRating(models.Model):
 
     host_id_hostRate = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='host_hostRate', on_delete=models.CASCADE, null=False)
     renter_id_hostRate = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_hostRate', on_delete=models.CASCADE, null=False)
-    date = models.DateTimeField(null=False)
+    date = models.DateField(null=False)
     rating = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
 
 class Reservation(models.Model):
 
     room_id_res = models.ForeignKey(Room, related_name='room_res', on_delete=models.CASCADE, null=False)
     renter_id_res = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_res', on_delete=models.CASCADE, null=False)
-    start_date = models.DateTimeField(null=False)
-    end_date = models.DateTimeField(null=False)
-    price = models.FloatField(null=False)
+    start_date = models.DateField(null=False)
+    end_date = models.DateField(null=False)
 
 class ClickedItem(models.Model):
 
     room_id_click = models.ForeignKey(Room, related_name='room_click', on_delete=models.CASCADE, null=False)
     renter_id_click = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_click', on_delete=models.CASCADE, null=False)
 
+class SearchedItem(models.Model):
 
+    room_id_search = models.ForeignKey(Room, related_name='room_search', on_delete=models.CASCADE, null=False)
+    renter_id_search = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_search', on_delete=models.CASCADE, null=False)
 
