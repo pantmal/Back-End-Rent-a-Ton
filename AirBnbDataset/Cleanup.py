@@ -2,6 +2,14 @@ import pandas as pd
 import glob 
 import os
 import numpy as np
+from textblob import TextBlob
+import nltk
+ 
+
+
+#downloading necessery toolkits
+nltk.download("wordnet")
+nltk.download("brown")
 
 df_listings=pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/listings.csv' )
 df_calendar=pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/calendar.csv' )
@@ -132,3 +140,25 @@ df_final = df_listings.merge(df_temp, how='inner', left_on='id', right_on='listi
 df_final = df_final.drop(columns=['amenities'])
 
 df_final.to_csv('/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/new_listings.csv')
+
+#read the file
+df_reviews=pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/reviews.csv' )
+
+#convert comments column to string
+df_reviews['comments']=df_reviews['comments'].astype(str)
+
+#keep the columns we need
+df_reviews=df_reviews[['listing_id','id','date','reviewer_id','comments']]
+
+# with pd.option_context('display.max_rows', None, 'display.max_columns', None): 
+#     print(df_reviews.head(20))
+#find polarity(sentiment of a text) for every row in the dataframe
+#polarity returns a decimal point number in the range of[-1,1].We want the range to be  [0,5] so 
+#we do the necessary conversions and rounding
+
+for row in range(0,len(df_reviews)):
+    blob=TextBlob(df_reviews.loc[row,'comments'])
+    temp=(blob.polarity*2)+3
+    temp=round(temp,1)
+    df_reviews.at[row,'comments']=temp
+df_reviews.to_csv('/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/new_reviews.csv')
