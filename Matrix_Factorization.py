@@ -136,9 +136,17 @@ for pred_list in final_preds:
     for x,y,z in pred_list:
         # print(id_list_users[y])
         # print(id_list[z])
-        recommendation = RecommendedItem(room_id_rec=Room.objects.get(pk=id_list[z]), renter_id_rec=CustomUser.objects.get(pk=id_list_users[y]))
-        recommendation.save()
-        top += 1
-        if top == 10:
-            break
+        room = Room.objects.get(pk=id_list[z])
+        host = room.host_id
+        user = CustomUser.objects.get(pk=id_list_users[y])
+        if user.id == host.id:
+            top += 1
+            continue
+        case = RecommendedItem.objects.filter(room_id_rec=Room.objects.get(pk=id_list[z]), renter_id_rec=CustomUser.objects.get(pk=id_list_users[y])).exists()
+        if case == False:
+            recommendation = RecommendedItem(room_id_rec=Room.objects.get(pk=id_list[z]), renter_id_rec=CustomUser.objects.get(pk=id_list_users[y]))
+            recommendation.save()
+            top += 1
+            if top == 10:
+                break
     
