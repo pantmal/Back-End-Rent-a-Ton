@@ -13,6 +13,7 @@ router.register(r'hostRatings', HostRatingViewSet)
 router.register(r'reservations', ReservationViewSet)
 router.register(r'clickedItems', ClickedItemViewSet)
 router.register(r'searchedItems', SearchedItemViewSet)
+router.register(r'recomItems', RecommendedItemViewSet)
 
 
 searchView = SearchRooms.as_view()

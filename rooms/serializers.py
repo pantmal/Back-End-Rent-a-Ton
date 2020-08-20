@@ -52,3 +52,9 @@ class SearchedItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = SearchedItem
         fields = ['pk', 'room_id_search', 'renter_id_search']
+
+class RecommendedItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RecommendedItem
+        fields = ['pk', 'room_id_rec', 'renter_id_rec']        

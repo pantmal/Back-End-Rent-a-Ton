@@ -88,3 +88,7 @@ class SearchedItem(models.Model):
     room_id_search = models.ForeignKey(Room, related_name='room_search', on_delete=models.CASCADE, null=False)
     renter_id_search = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_search', on_delete=models.CASCADE, null=False)
 
+class RecommendedItem(models.Model):
+
+    room_id_rec = models.ForeignKey(Room, related_name='room_recom', on_delete=models.CASCADE, null=False)
+    renter_id_rec = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_recom', on_delete=models.CASCADE, null=False)

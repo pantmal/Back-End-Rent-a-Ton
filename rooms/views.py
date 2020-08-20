@@ -92,6 +92,19 @@ class SearchedItemViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]        
 
 
+class RecommendedItemViewSet(viewsets.ModelViewSet):
+    queryset = RecommendedItem.objects.all()
+    serializer_class = RecommendedItemSerializer
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]        
+
+
+
 class SearchRooms(APIView):
 
     permission_classes = [AllowAny]
@@ -103,6 +116,22 @@ class SearchRooms(APIView):
         rooms = Room.objects.all()
 
         rooms_to_return = []
+
+        if 'recom' in parameters:
+            recoms = RecommendedItem.objects.all()
+            recoms = recoms.filter(renter_id_rec=request.data['user_id'])
+            
+            rooms_to_return = []
+
+            for recom in recoms:
+                rooms_to_return.append(recom.room_id_rec)
+
+            
+            if not rooms_to_return:
+                return Response('not found')
+            else:
+                roomSerializer = RoomSerializer(rooms_to_return, many=True)
+                return Response(roomSerializer.data)
 
         if 'host_id' in parameters:
 
@@ -202,6 +231,9 @@ class SearchRooms(APIView):
                 case_3 = Reservation.objects.filter(room_id_res=room.id, start_date__gte=request_s_date, end_date__lte=request_e_date).exists()
                 if case_3:
                     rooms = rooms.exclude(pk=room.id)    
+        else:
+            return Response('not found')           
+        
             
 
         rooms_to_return = []

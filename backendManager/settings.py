@@ -160,5 +160,7 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT'
 }
 
+DJANGO_SETTINGS_MODULE = True
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
