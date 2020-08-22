@@ -14,6 +14,7 @@ class CustomUser(AbstractUser):
     is_host = models.BooleanField(default=False)
     is_renter = models.BooleanField(default=False)
     picture = models.FileField(upload_to='user_images',blank=True,null=True)
+    secondary_id = models.IntegerField()
 
     #session_client = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     #location = models.PointField(null=True, blank=True)

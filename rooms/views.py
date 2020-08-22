@@ -92,9 +92,9 @@ class SearchedItemViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]        
 
 
-class RecommendedItemViewSet(viewsets.ModelViewSet):
-    queryset = RecommendedItem.objects.all()
-    serializer_class = RecommendedItemSerializer
+class RecommendationViewSet(viewsets.ModelViewSet):
+    queryset = Recommendation.objects.all()
+    serializer_class = RecommendationSerializer
 
     def get_permissions(self):
         """
@@ -118,7 +118,7 @@ class SearchRooms(APIView):
         rooms_to_return = []
 
         if 'recom' in parameters:
-            recoms = RecommendedItem.objects.all()
+            recoms = Recommendation.objects.all()
             recoms = recoms.filter(renter_id_rec=request.data['user_id'])
             
             rooms_to_return = []
@@ -161,10 +161,11 @@ class SearchRooms(APIView):
         print(request.data['user_id'])
         rooms = rooms.exclude(host_id=request.data['user_id'])
 
+
         rooms = rooms.filter(neighborhood=request.data['hood'])
         rooms = rooms.filter(city=request.data['city'])
         rooms = rooms.filter(country=request.data['country'])
-
+        
         if 'room_type' in parameters:
             if 'room_type' != '':
                 if request.data['room_type'] == 'Private_room':
@@ -215,6 +216,7 @@ class SearchRooms(APIView):
         request_e_date = request.data['e_date']
         request_e_date = datetime.datetime.strptime(request_e_date, "%Y-%m-%d").date()
         case = rooms.filter(start_date__lte=request_s_date, end_date__gte=request_e_date).exists()
+
         
         if case==True:
             rooms = rooms.filter(start_date__lte=request_s_date, end_date__gte=request_e_date)
@@ -234,18 +236,17 @@ class SearchRooms(APIView):
         else:
             return Response('not found')           
         
-            
-
+        
         rooms_to_return = []
         final_rooms = []
         
         if 'max_price' in parameters:
-            if 'max_price' != '':
+            if request.data['max_price'] != '':
 
                 for room in rooms:
                 
                     total_price = room.price + ((request_ppl-1) * room.price_per_person)
-                    request_price = int(request.data['max_price']) #CHANGE TO FLOAT SOMETIME
+                    request_price = float(request.data['max_price']) #CHANGE TO FLOAT SOMETIME
                     if total_price <= request_price:
                         final_rooms.append(room)    
             else:

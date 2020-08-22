@@ -10,7 +10,7 @@ class RoomSerializer(serializers.ModelSerializer):
         'price', 'price_per_person', 'max_people', 'beds', 'bedrooms', 'bathrooms', 'rep_photo', 'room_type',
         'has_wifi', 'has_heating', 'has_freezer', 'has_kitchen', 'has_TV', 'has_parking', 'has_elevator',
         'has_living_room', 'square_feet', 'description', 'smoking', 'pets', 'events', 'minimum_nights',
-        'host_id', 'reserved' 
+        'host_id', 'secondary_id' 
         ]
         
 class RoomImageSerializer(serializers.ModelSerializer):
@@ -53,8 +53,8 @@ class SearchedItemSerializer(serializers.ModelSerializer):
         model = SearchedItem
         fields = ['pk', 'room_id_search', 'renter_id_search']
 
-class RecommendedItemSerializer(serializers.ModelSerializer):
+class RecommendationSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = RecommendedItem
+        model = Recommendation
         fields = ['pk', 'room_id_rec', 'renter_id_rec']        

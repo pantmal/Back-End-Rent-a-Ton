@@ -19,6 +19,9 @@ df_listings=df_listings[['id','name','latitude','longitude','street', 'neighbour
           'accommodates','beds' ,'bedrooms','bathrooms','room_type',
                          'amenities','square_feet','description','minimum_nights','host_id','city','country']]
 
+#df_listings['price'] = df_listings['price'].replace({'\$': ''}, regex=True)
+#df_listings['extra_people'] = df_listings['extra_people'].replace({'\$': ''}, regex=True)
+df_listings = df_listings.drop_duplicates(subset=['id'])
 
 #extra columns needed
 df_listings['has_wifi']=False
@@ -112,6 +115,7 @@ for row in range(0,len(df_listings)):
 
 #count the unique host id values
 print(df_listings['host_id'].nunique())      
+print(df_listings['id'].nunique())      
 # df_listings['square_feet']=df_listings['square_feet'].astype(float)
 df_listings=df_listings.dropna()
 # with pd.option_context('display.max_rows', None, 'display.max_columns', None): 
@@ -150,6 +154,9 @@ df_reviews['comments']=df_reviews['comments'].astype(str)
 #keep the columns we need
 df_reviews=df_reviews[['listing_id','id','date','reviewer_id','comments']]
 
+print(df_reviews['id'].nunique())  
+print(df_reviews['listing_id'].nunique())  
+print(df_reviews['reviewer_id'].nunique())      
 # with pd.option_context('display.max_rows', None, 'display.max_columns', None): 
 #     print(df_reviews.head(20))
 #find polarity(sentiment of a text) for every row in the dataframe

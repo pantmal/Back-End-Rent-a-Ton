@@ -16,13 +16,13 @@ class Room(models.Model):
         (ENTIRE, "ENTIRE HOUSE")
     )
 
-    name = models.CharField(max_length=50, null=False)
+    name = models.CharField(max_length=500, null=False)
     geolocation = models.PointField(null=False)
     street = models.CharField(max_length=100, null=False)
     neighborhood = models.CharField(max_length=50, null=False)
     city = models.CharField(max_length=50, null=False)
     country = models.CharField(max_length=50, null=False)
-    transit = models.CharField(max_length=500, null=False)
+    transit = models.CharField(max_length=2000, null=False)
     start_date = models.DateField(null=False)
     end_date = models.DateField(null=False)
     price = models.FloatField(null=False)
@@ -48,7 +48,7 @@ class Room(models.Model):
     events = models.BooleanField(default=False)
     minimum_nights = models.IntegerField()
     host_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='host', on_delete=models.CASCADE, null=False)
-    reserved = models.BooleanField(default=False)
+    secondary_id = models.IntegerField()
 
 
 class RoomImage(models.Model):
@@ -62,7 +62,7 @@ class RoomRating(models.Model):
     renter_id_rate = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_rate', on_delete=models.CASCADE, null=False)
     date = models.DateField(null=False)
     rating = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
-
+    secondary_id = models.IntegerField()
 
 class HostRating(models.Model):
 
@@ -88,7 +88,7 @@ class SearchedItem(models.Model):
     room_id_search = models.ForeignKey(Room, related_name='room_search', on_delete=models.CASCADE, null=False)
     renter_id_search = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_search', on_delete=models.CASCADE, null=False)
 
-class RecommendedItem(models.Model):
+class Recommendation(models.Model):
 
     room_id_rec = models.ForeignKey(Room, related_name='room_recom', on_delete=models.CASCADE, null=False)
     renter_id_rec = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_recom', on_delete=models.CASCADE, null=False)

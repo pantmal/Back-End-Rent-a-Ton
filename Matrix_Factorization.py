@@ -2,6 +2,7 @@ import numpy
 import numpy as np
 import pandas as pd
 import os
+import progressbar as pb
 from django.db.models import Avg
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backendManager.settings")
@@ -19,10 +20,10 @@ from operator import itemgetter
 
 #alpha = learning rate
 #beta = normalization factor
-def Matrix_Factorization(R, P, Q, K, steps=3000, alpha=0.02, beta=0.02, gamma=0.05):
+def Matrix_Factorization(R, P, Q, K, steps=1000, alpha=0.02, beta=0.02, gamma=0.05):
     #Q = Q.T
     print(range(len(R)))
-    for step in range(steps):
+    for step in pb.progressbar(range(steps)):
         for i in range(len(R)):
             for j in range(len(R[i])):
                 if R[i][j] > 0:
@@ -60,13 +61,17 @@ users = users.filter(is_renter=True)
 
 df = pd.DataFrame(list(Room.objects.all().values()))
 df = df.sort_values(by=['id'])
+df = df.tail(200)
 id_list = df['id'].tolist()
+print(len(id_list))
 
 us_df = pd.DataFrame(list(users.values()))
 us_df = us_df.sort_values(by=['id'])
+us_df = us_df.tail(200)
 id_list_users = us_df['id'].tolist()
+print(len(id_list_users))
 
-Real_Items = [['' for i in range(len(rooms))] for j in range(len(users))]
+Real_Items = [['' for i in range(len(id_list))] for j in range(len(id_list_users))]
 
 
 for num_i, user_id in enumerate(id_list_users):
@@ -96,7 +101,10 @@ for i, user_id in enumerate(Real_Items):
 R = numpy.array(Real_Items)
 M = len(R)
 N = len(R[0])
-K = 10
+K = 2
+
+print(M)
+print(N)
 
 P = numpy.random.rand(M,K)
 Q = numpy.random.rand(K,N)
@@ -142,9 +150,9 @@ for pred_list in final_preds:
         if user.id == host.id:
             top += 1
             continue
-        case = RecommendedItem.objects.filter(room_id_rec=Room.objects.get(pk=id_list[z]), renter_id_rec=CustomUser.objects.get(pk=id_list_users[y])).exists()
+        case = Recommendation.objects.filter(room_id_rec=Room.objects.get(pk=id_list[z]), renter_id_rec=CustomUser.objects.get(pk=id_list_users[y])).exists()
         if case == False:
-            recommendation = RecommendedItem(room_id_rec=Room.objects.get(pk=id_list[z]), renter_id_rec=CustomUser.objects.get(pk=id_list_users[y]))
+            recommendation = Recommendation(room_id_rec=Room.objects.get(pk=id_list[z]), renter_id_rec=CustomUser.objects.get(pk=id_list_users[y]))
             recommendation.save()
             top += 1
             if top == 10:

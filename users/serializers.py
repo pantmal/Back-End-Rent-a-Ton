@@ -5,7 +5,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CustomUser
-        fields = ['pk', 'username', 'first_name', 'last_name', 'email', 'password', 'is_staff', 'telephone', 'approved', 'is_host', 'is_renter','picture']
+        fields = ['pk', 'username', 'first_name', 'last_name', 'email', 'password', 'is_staff', 'telephone', 'approved', 'is_host', 'is_renter','picture','secondary_id']
         extra_kwargs = {'password': {'write_only': True, 'required': True}}
 
     def create(self, validated_data):
@@ -25,6 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
         instance.is_host = validated_data.get('is_host', instance.is_host)
         instance.is_renter = validated_data.get('is_renter', instance.is_renter)
         instance.picture = validated_data.get('picture', instance.picture)
+        instance.secondary_id = validated_data.get('secondary_id', instance.secondary_id)
 
         #password = ''
         #if(validated_data.pop('password')):
