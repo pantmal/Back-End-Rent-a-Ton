@@ -22,3 +22,13 @@ class CustomUser(AbstractUser):
 #Check sometime: proper extend of user model
 #class Profile(models.Model): 
 #    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+
+class Message(models.Model):
+
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='sender', on_delete=models.CASCADE, null=False)
+    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='receiver', on_delete=models.CASCADE, null=False)
+    sender_name = models.CharField(max_length=100)
+    receiver_name = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
+    content = models.TextField(max_length=7000, null=False)
+    date = models.DateField(null=False)    

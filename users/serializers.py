@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import *
 
 class UserSerializer(serializers.ModelSerializer):
     
@@ -35,3 +35,9 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
+
+class MessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Message
+        fields = ['pk', 'sender', 'sender_name', 'receiver', 'receiver_name', 'title', 'content', 'date']
