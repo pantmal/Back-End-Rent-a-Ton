@@ -5,6 +5,9 @@ from django.db.models import Avg
 from .models import *
 from .serializers import *
 from users.models import *
+from permissions import *
+from django.core import serializers
+from django.core.files import File
 
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
@@ -21,7 +24,11 @@ class RoomViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        permission_classes = [AllowAny]
+        permission_classes = []
+        if self.action == 'list' or self.action == 'retrieve':
+            permission_classes = [AllowAny]
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
+            permission_classes = [IsHostUser]
         return [permission() for permission in permission_classes]
 
 
@@ -33,7 +40,11 @@ class RoomImageViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        permission_classes = [AllowAny]
+        permission_classes = []
+        if self.action == 'list' or self.action == 'retrieve':
+            permission_classes = [AllowAny]
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
+            permission_classes = [IsHostUser]
         return [permission() for permission in permission_classes]
 
 class RoomRatingViewSet(viewsets.ModelViewSet):
@@ -44,7 +55,11 @@ class RoomRatingViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        permission_classes = [AllowAny]
+        permission_classes = []
+        if self.action == 'list' or self.action == 'retrieve':
+            permission_classes = [AllowAny]
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
+            permission_classes = [IsRenterUser]
         return [permission() for permission in permission_classes]
 
 class HostRatingViewSet(viewsets.ModelViewSet):
@@ -55,7 +70,11 @@ class HostRatingViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        permission_classes = [AllowAny]
+        permission_classes = []
+        if self.action == 'list' or self.action == 'retrieve':
+            permission_classes = [AllowAny]
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
+            permission_classes = [IsRenterUser]
         return [permission() for permission in permission_classes]                        
 
 class ReservationViewSet(viewsets.ModelViewSet):
@@ -66,7 +85,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        permission_classes = [AllowAny]
+        permission_classes = []
+        if self.action == 'list' or self.action == 'retrieve':
+            permission_classes = [AllowAny]
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
+            permission_classes = [IsRenterUser]
         return [permission() for permission in permission_classes]        
 
 class ClickedItemViewSet(viewsets.ModelViewSet):
@@ -77,7 +100,11 @@ class ClickedItemViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        permission_classes = [AllowAny]
+        permission_classes = []
+        if self.action == 'list' or self.action == 'retrieve':
+            permission_classes = [AllowAny]
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
+            permission_classes = [IsRenterUser]
         return [permission() for permission in permission_classes]        
 
 class SearchedItemViewSet(viewsets.ModelViewSet):
@@ -88,7 +115,11 @@ class SearchedItemViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        permission_classes = [AllowAny]
+        permission_classes = []
+        if self.action == 'list' or self.action == 'retrieve':
+            permission_classes = [AllowAny]
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
+            permission_classes = [IsRenterUser]
         return [permission() for permission in permission_classes]        
 
 
@@ -100,8 +131,13 @@ class RecommendationViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        permission_classes = [AllowAny]
-        return [permission() for permission in permission_classes]        
+        permission_classes = []
+        if self.action == 'list' or self.action == 'retrieve':
+            permission_classes = [AllowAny]
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
+            permission_classes = [IsRenterUser]
+        #permission_classes = [AllowAny]
+        #return [permission() for permission in permission_classes]        
 
 
 
@@ -287,7 +323,7 @@ class GetImages(APIView):
 
 class AddSearchesClicks(APIView):
 
-    permission_classes = [AllowAny]
+    permission_classes = [IsRenterUser]
 
     def post(self, request, format=None):
 
@@ -396,3 +432,63 @@ class RatingCount(APIView):
             return Response({'count':count,'avg':avg})
 
         return Response('something went wrong')
+
+class ExportData(APIView):
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, format=None):
+
+        format_type = request.data['type']        
+        
+        if format_type == 'xml':
+            room_data = serializers.serialize("xml", Room.objects.all())
+            f = open('rooms.xml', 'w')
+            myfile = File(f)
+            myfile.write(room_data)
+            myfile.close()
+
+            room_rating_data = serializers.serialize("xml", RoomRating.objects.all())
+            f1 = open('room_ratings.xml', 'w')
+            myfile1 = File(f1)
+            myfile1.write(room_rating_data)
+            myfile1.close()
+
+            host_rating_data = serializers.serialize("xml", HostRating.objects.all())
+            f2 = open('host_ratings.xml', 'w')
+            myfile2 = File(f2)
+            myfile2.write(host_rating_data)
+            myfile2.close()
+
+            res_data = serializers.serialize("xml", Reservation.objects.all())
+            f3 = open('reservations.xml', 'w')
+            myfile3 = File(f3)
+            myfile3.write(res_data)
+            myfile3.close()
+        elif format_type == 'json':
+            room_data = serializers.serialize("json", Room.objects.all())
+            f = open('rooms.json', 'w')
+            myfile = File(f)
+            myfile.write(room_data)
+            myfile.close()
+
+            room_rating_data = serializers.serialize("json", RoomRating.objects.all())
+            f1 = open('room_ratings.json', 'w')
+            myfile1 = File(f1)
+            myfile1.write(room_rating_data)
+            myfile1.close()
+
+            host_rating_data = serializers.serialize("json", HostRating.objects.all())
+            f2 = open('host_ratings.json', 'w')
+            myfile2 = File(f2)
+            myfile2.write(host_rating_data)
+            myfile2.close()
+
+            res_data = serializers.serialize("json", Reservation.objects.all())
+            f3 = open('reservations.json', 'w')
+            myfile3 = File(f3)
+            myfile3.write(res_data)
+            myfile3.close()
+        
+        return Response('finished')
+            

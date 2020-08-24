@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from .models import *
 from .serializers import *
+from permissions import *
 
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
@@ -38,7 +39,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         Instantiates and returns the list of permissions that this view requires.
         """
     
-        permission_classes = [AllowAny]
+        permission_classes = [IsHostUser|IsRenterUser]
         return [permission() for permission in permission_classes]
 
 
@@ -62,7 +63,7 @@ class GetUserByName(APIView):
 
 class GetMessages(APIView):
 
-    permission_classes = [AllowAny]
+    permission_classes = [IsHostUser|IsRenterUser]
 
     def post(self, request, format=None):
 

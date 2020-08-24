@@ -24,7 +24,7 @@ class RoomRatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RoomRating
-        fields = ['pk', 'room_id_rate', 'renter_id_rate', 'date', 'rating']
+        fields = ['pk', 'room_id_rate', 'renter_id_rate', 'date', 'rating', 'secondary_id']
 
 
 class HostRatingSerializer(serializers.ModelSerializer):

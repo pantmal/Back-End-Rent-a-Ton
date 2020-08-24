@@ -22,6 +22,7 @@ addSearchesClicks = AddSearchesClicks.as_view()
 resCheck = ReservationCheck.as_view()
 ratCheck = RatingCheck.as_view()
 ratCount = RatingCount.as_view()
+exportData = ExportData.as_view()
 
 urlpatterns = [
 
@@ -31,5 +32,6 @@ urlpatterns = [
     path('addSearchesClicks/', addSearchesClicks, name='add-searches-clicks'),
     path('resCheck/', resCheck, name='res-check'),
     path('ratCheck/', ratCheck, name='rat-check'),
-    path('ratCount/', ratCount, name='rat-check')
+    path('ratCount/', ratCount, name='rat-check'),
+    path('exportData/', exportData, name='export-data')
 ] 
