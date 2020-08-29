@@ -20,6 +20,7 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
+#Added user and room related URLs, as well as the url needed for the media folder.
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     path(r'users/', include('users.urls')),

@@ -4,7 +4,9 @@ from rest_framework import routers
 
 from rooms.views import *
 
+#Defining the room-related URLs of the django server, using our views. 
 
+#Using viewsets for the models.
 router = routers.DefaultRouter()
 router.register(r'roomList', RoomViewSet)
 router.register(r'roomImages', RoomImageViewSet)
@@ -15,7 +17,7 @@ router.register(r'clickedItems', ClickedItemViewSet)
 router.register(r'searchedItems', SearchedItemViewSet)
 router.register(r'recommendations', RecommendationViewSet)
 
-
+#Getting the other classes as views.
 searchView = SearchRooms.as_view()
 getImagesView = GetImages.as_view()
 addSearchesClicks = AddSearchesClicks.as_view()
@@ -24,6 +26,7 @@ ratCheck = RatingCheck.as_view()
 ratCount = RatingCount.as_view()
 exportData = ExportData.as_view()
 
+#Defining URL patterns.
 urlpatterns = [
 
     path(r'', include(router.urls)),

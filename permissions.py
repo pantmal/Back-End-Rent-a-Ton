@@ -1,7 +1,6 @@
 from rest_framework import permissions
 
-
-
+#Creating custom permissions based on the the host/renter status of the users.
 
 class IsHostUser(permissions.BasePermission):
 

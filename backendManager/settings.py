@@ -83,6 +83,7 @@ WSGI_APPLICATION = 'backendManager.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+#Settings for the Postgres Database.
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -137,6 +138,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
+#Permission-specific settings used by Rest Framework.
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -149,8 +151,11 @@ REST_FRAMEWORK = {
     ),
 }
 
+#Using JSON web tokens.
 REST_USE_JWT = True
 
+#Specifying settings for the JSON web tokens.
+#CHANGE SOME STUFF HERE
 JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'mysite.utils.my_jwt_response_handler',
     'JWT_VERIFY': True,
@@ -160,7 +165,9 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT'
 }
 
+#Used so we can use settings in other Python scripts.
 DJANGO_SETTINGS_MODULE = True
 
+#Settings for the media folder, where all the images are stored.
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

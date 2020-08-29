@@ -4,6 +4,7 @@ from django.db.models import Avg
 from django.contrib.auth.hashers import make_password
 from django.contrib.gis.geos import Point
 
+#The following commands are necessary in order to use the Django models in this script.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backendManager.settings")
 import django
 django.setup()
@@ -16,30 +17,28 @@ from django.apps import apps
 from users.models import *
 from rooms.models import *
 
-
+#Getting unique host ids from the listings dataframe.
 listings_df = pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/new_listings.csv' )
-
 id_list = listings_df.drop_duplicates(subset=['host_id'])['host_id'].tolist()
 
+#Getting unique reviewer ids from the reviews dataframe (so they can be used as renters).
 reviews_df = pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/new_reviews.csv' )
-
 rev_id_list = reviews_df.drop_duplicates(subset=['reviewer_id'])['reviewer_id'].tolist()
 
 #print(len(rev_id_list))
-
 #print(reviews_df['reviewer_id'].nunique())
-
 #print(len(id_list))
-
 #print(listings_df['host_id'].nunique())
-
 #print(any(x in rev_id_list for x in id_list))
+
+#Adding users with both host and renter capabilities in a different list.
 host_renter = []
 c = 0
 for x in id_list:
     if x in rev_id_list:
         host_renter.append(x)
 
+#Removing the host+renters from the other lists.
 for x in id_list:
     if x in rev_id_list:   
         id_list.remove(x)
@@ -53,18 +52,16 @@ for x in id_list:
 
 # print(len(host_renter))
 # print(len(rev_id_list))
-
 # print(reviews_df['reviewer_id'].nunique())
-
 # print(len(id_list))
-
 # print(listings_df['host_id'].nunique())        
 
-#DELETE IF THERE IS A PROBLEM WITH USERS
+#Use the following lines to delete the users from the dataframes if there is a problem
 # CustomUser.objects.filter(email="userHost@gmail.com").delete()
 # CustomUser.objects.filter(email="userHostRen@gmail.com").delete()
 # CustomUser.objects.filter(email="userRen@gmail.com").delete()
 
+#Adding host+renters in the database.
 # for _id in host_renter:
 #     user = CustomUser(
 #         username="User"+str(_id),
@@ -82,6 +79,7 @@ for x in id_list:
 #         )
 #     user.save()
 
+#Adding hosts in the database.
 # for _id in id_list:
 #     user = CustomUser(
 #         username="User"+str(_id),
@@ -99,6 +97,7 @@ for x in id_list:
 #         )
 #     user.save()
 
+#Adding renters in the database.
 #for _id in rev_id_list:
 #    user = CustomUser(
 #        username="User"+str(_id),
@@ -116,8 +115,10 @@ for x in id_list:
 #        )
 #    user.save()
 
+#Use the following line to delete the rooms from the dataframes if there is a problem
 # Room.objects.exclude(secondary_id=1).delete()
 
+#Adding rooms in the database.
 # with open('/home/pantmal/Documents/backend/src/backendManager/new_listings.csv') as f:
 #     reader = csv.reader(f)
 #     for row in reader:
@@ -163,6 +164,7 @@ for x in id_list:
 
 #MAY NEED SOME MORE CHECKS  
 
+#Adding reviews in the database.
 with open('/home/pantmal/Documents/backend/src/backendManager/new_reviews.csv') as f:
     reader = csv.reader(f)
     for row in reader:

@@ -11,8 +11,8 @@ import nltk
 nltk.download("wordnet")
 nltk.download("brown")
 
-df_listings=pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/listings.csv' )
-df_calendar=pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/calendar.csv' )
+df_listings=pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/listings.csv' )
+df_calendar=pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/calendar.csv' )
 
 #keep the columns we need
 df_listings=df_listings[['id','name','latitude','longitude','street', 'neighbourhood','transit','price','extra_people',
@@ -142,10 +142,10 @@ df_final = df_listings.merge(df_temp, how='inner', left_on='id', right_on='listi
 
 df_final = df_final.drop(columns=['amenities'])
 
-df_final.to_csv('/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/new_listings.csv')
+df_final.to_csv('/home/pantmal/Documents/backend/src/backendManager/new_listings.csv')
 
 #read the file
-df_reviews=pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/reviews.csv' )
+df_reviews=pd.read_csv(r'/home/pantmal/Documents/backend/src/backendManager/reviews.csv' )
 
 #convert comments column to string
 df_reviews['comments']=df_reviews['comments'].astype(str)
@@ -167,4 +167,4 @@ for row in range(0,len(df_reviews)):
     temp=(blob.polarity*2)+3
     temp=round(temp,1)
     df_reviews.at[row,'comments']=temp
-df_reviews.to_csv('/home/pantmal/Documents/backend/src/backendManager/AirBnbDataset/new_reviews.csv')
+df_reviews.to_csv('/home/pantmal/Documents/backend/src/backendManager/new_reviews.csv')

@@ -16,6 +16,8 @@ from rest_framework.response import Response
 import datetime
 
 # Create your views here.
+
+#Using ViewSets for the room-related models.
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
@@ -140,9 +142,10 @@ class RecommendationViewSet(viewsets.ModelViewSet):
         #return [permission() for permission in permission_classes]        
 
 
-
+#SearchRooms view for whenever we want to get rooms.
 class SearchRooms(APIView):
 
+    #Any user can search for rooms.
     permission_classes = [AllowAny]
 
     def post(self, request, format=None):
@@ -153,6 +156,7 @@ class SearchRooms(APIView):
 
         rooms_to_return = []
 
+        #Getting only recommended rooms.
         if 'recom' in parameters:
             recoms = Recommendation.objects.all()
             recoms = recoms.filter(renter_id_rec=request.data['user_id'])
@@ -162,13 +166,13 @@ class SearchRooms(APIView):
             for recom in recoms:
                 rooms_to_return.append(recom.room_id_rec)
 
-            
             if not rooms_to_return:
                 return Response('not found')
             else:
                 roomSerializer = RoomSerializer(rooms_to_return, many=True)
                 return Response(roomSerializer.data)
 
+        #Getting only rooms that belong to a specific host.
         if 'host_id' in parameters:
 
             rooms = rooms.filter(host_id=request.data['host_id'])
@@ -179,6 +183,7 @@ class SearchRooms(APIView):
                 roomSerializer = RoomSerializer(rooms_to_return, many=True)
                 return Response(roomSerializer.data)
 
+        #Getting only rooms that a specific renter has reserved.
         if 'renter_id' in parameters:
 
             reservations = Reservation.objects.filter(renter_id_res=request.data['renter_id'])
@@ -194,14 +199,15 @@ class SearchRooms(APIView):
                 roomSerializer = RoomSerializer(rooms_to_return, many=True)
                 return Response(roomSerializer.data)
 
-        print(request.data['user_id'])
+        #Exclude all the rooms that a user is also a host. (So a renter cannot search for his own rooms)
         rooms = rooms.exclude(host_id=request.data['user_id'])
 
-
+        #Filter the rooms by location.
         rooms = rooms.filter(neighborhood=request.data['hood'])
         rooms = rooms.filter(city=request.data['city'])
         rooms = rooms.filter(country=request.data['country'])
         
+        #Filter by room type, if needed
         if 'room_type' in parameters:
             if 'room_type' != '':
                 if request.data['room_type'] == 'Private_room':
@@ -211,7 +217,9 @@ class SearchRooms(APIView):
                 if request.data['room_type'] == 'Entire_home/apt':
                     rooms = rooms.filter(room_type='Entire home/apt')
 
-        
+
+        #Using the additional filters if needed.
+
         if 'wifi' in parameters:
             if request.data['wifi'] == 'true':
                 rooms = rooms.filter(has_wifi=True)
@@ -241,11 +249,12 @@ class SearchRooms(APIView):
                 rooms = rooms.filter(has_elevator=True)
 
 
+        #Filtering by number of people.
         request_ppl = int(request.data['people'])
         rooms = rooms.filter(max_people__gte=request_ppl)
 
+        #Filtering rooms that are between the specified dates.
         date_check = False
-        
         request_s_date = request.data['s_date']
         request_s_date = datetime.datetime.strptime(request_s_date, "%Y-%m-%d").date()
 
@@ -253,7 +262,7 @@ class SearchRooms(APIView):
         request_e_date = datetime.datetime.strptime(request_e_date, "%Y-%m-%d").date()
         case = rooms.filter(start_date__lte=request_s_date, end_date__gte=request_e_date).exists()
 
-        
+        #Checking if there are any reservations in the specified dates.
         if case==True:
             rooms = rooms.filter(start_date__lte=request_s_date, end_date__gte=request_e_date)
             
@@ -276,13 +285,14 @@ class SearchRooms(APIView):
         rooms_to_return = []
         final_rooms = []
         
+        #Filtering rooms by max price, if needed.
         if 'max_price' in parameters:
             if request.data['max_price'] != '':
 
                 for room in rooms:
                 
                     total_price = room.price + ((request_ppl-1) * room.price_per_person)
-                    request_price = float(request.data['max_price']) #CHANGE TO FLOAT SOMETIME
+                    request_price = float(request.data['max_price'])
                     if total_price <= request_price:
                         final_rooms.append(room)    
             else:
@@ -290,17 +300,18 @@ class SearchRooms(APIView):
         else:
             final_rooms = rooms
         
-    
+        #Adding the final rooms in an array.
         rooms_to_return = final_rooms
         print(rooms_to_return)
         
-
+        #Returning rooms using the serializer.
         if not rooms_to_return:
             return Response('not found')
         else:
             roomSerializer = RoomSerializer(rooms_to_return, many=True)
             return Response(roomSerializer.data)
 
+#Getting images that belong to a specific Room.
 class GetImages(APIView):
 
     permission_classes = [AllowAny]
@@ -321,6 +332,7 @@ class GetImages(APIView):
             roomImageSerializer = RoomImageSerializer(imgs_to_return, many=True)
             return Response(roomImageSerializer.data)
 
+#Adding searches and clicks, if they don't already exist (used for the Recommendation system).
 class AddSearchesClicks(APIView):
 
     permission_classes = [IsRenterUser]
@@ -355,6 +367,7 @@ class AddSearchesClicks(APIView):
 
         return Response('ok')
         
+#Checking if a room can be reserved for the specified dates
 class ReservationCheck(APIView):       
 
     permission_classes = [AllowAny]
@@ -366,20 +379,23 @@ class ReservationCheck(APIView):
         check_in = request.data['start_date'] 
         check_out = request.data['end_date']
 
-        # check wether the dates are valid
-        # case 1: a room is booked before the check_in date, and checks out after the requested check_in date
+        
+        #Case 1: 1) a room is booked before the check in date and 2) checks out after the requested check_in date
         case_1 = Reservation.objects.filter(room_id_res=request.data['room_id'], start_date__lte=check_in, end_date__gte=check_in).exists()
 
-        # case 2: a room is booked before the requested check_out date and check_out date is after requested check_out date
+        #Case 2: 1) a room is booked before the requested check out date and 2) check out date is after requested check out date
         case_2 = Reservation.objects.filter(room_id_res=request.data['room_id'], start_date__lte=check_out, end_date__gte=check_out).exists()
         
+        #Case 3: a room is booked between the requested dates.
         case_3 = Reservation.objects.filter(room_id_res=request.data['room_id'], start_date__gte=check_in, end_date__lte=check_out).exists()
 
+        #Returning whether a room can be booked or not.
         if case_1 or case_2 or case_3:
             return Response('taken')
         else:
             return Response('free')
 
+#Checking if user can leave a rating.
 class RatingCheck(APIView):       
 
     permission_classes = [AllowAny]
@@ -392,13 +408,16 @@ class RatingCheck(APIView):
         user_id = request.data['user_id']
         date_now = request.data['date_now']
         
+        #All we need to check is whether the current date is after the end date of at least one reservation made by the user.
         case = Reservation.objects.filter(room_id_res=room_id, renter_id_res=user_id, end_date__lt=date_now).exists()
 
+        #Returning whether a room can be rated or not.
         if case:
             return Response('free')
         else:
             return Response('bounded')
 
+#Returning counts of ratings and their average number, for either one room or one host.
 class RatingCount(APIView):       
 
     permission_classes = [AllowAny]
@@ -433,6 +452,7 @@ class RatingCount(APIView):
 
         return Response('something went wrong')
 
+#Exportind data an admin may need (specifically: rooms, reservations, room and host ratings)
 class ExportData(APIView):
 
     permission_classes = [IsAdminUser]
@@ -441,6 +461,7 @@ class ExportData(APIView):
 
         format_type = request.data['type']        
         
+        #XML format.
         if format_type == 'xml':
             room_data = serializers.serialize("xml", Room.objects.all())
             f = open('rooms.xml', 'w')
@@ -465,6 +486,7 @@ class ExportData(APIView):
             myfile3 = File(f3)
             myfile3.write(res_data)
             myfile3.close()
+        #JSON format.
         elif format_type == 'json':
             room_data = serializers.serialize("json", Room.objects.all())
             f = open('rooms.json', 'w')
@@ -491,4 +513,5 @@ class ExportData(APIView):
             myfile3.close()
         
         return Response('finished')
+            
             

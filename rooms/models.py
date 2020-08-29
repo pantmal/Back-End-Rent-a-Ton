@@ -1,9 +1,10 @@
 from django.contrib.gis.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
+
 # Create your models here.
 
-
+#Defining the Room model.
 class Room(models.Model):
 
     PRIV = "Private room"
@@ -50,12 +51,13 @@ class Room(models.Model):
     host_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='host', on_delete=models.CASCADE, null=False)
     secondary_id = models.IntegerField()
 
-
+#Defining the Room Image model (used whenever a room has more than one image).
 class RoomImage(models.Model):
 
     room_id_img = models.ForeignKey(Room, related_name='room_img', on_delete=models.CASCADE, null=False)
     picture = models.FileField(upload_to='user_images',blank=True,null=True)
 
+#Defining the Room Rating model.
 class RoomRating(models.Model):
 
     room_id_rate = models.ForeignKey(Room, related_name='room_rate', on_delete=models.CASCADE, null=False)
@@ -64,6 +66,7 @@ class RoomRating(models.Model):
     rating = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
     secondary_id = models.IntegerField()
 
+#Defining the Host Rating model.
 class HostRating(models.Model):
 
     host_id_hostRate = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='host_hostRate', on_delete=models.CASCADE, null=False)
@@ -71,6 +74,7 @@ class HostRating(models.Model):
     date = models.DateField(null=False)
     rating = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
 
+#Defining the Reservation model.
 class Reservation(models.Model):
 
     room_id_res = models.ForeignKey(Room, related_name='room_res', on_delete=models.CASCADE, null=False)
@@ -78,16 +82,19 @@ class Reservation(models.Model):
     start_date = models.DateField(null=False)
     end_date = models.DateField(null=False)
 
+#Defining the ClickedItem model (used for the Recommendation system).
 class ClickedItem(models.Model):
 
     room_id_click = models.ForeignKey(Room, related_name='room_click', on_delete=models.CASCADE, null=False)
     renter_id_click = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_click', on_delete=models.CASCADE, null=False)
 
+#Defining the SearchedItem model (used for the Recommendation system).
 class SearchedItem(models.Model):
 
     room_id_search = models.ForeignKey(Room, related_name='room_search', on_delete=models.CASCADE, null=False)
     renter_id_search = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_search', on_delete=models.CASCADE, null=False)
 
+#Defining the Recommendation model (used for the Recommendation system).
 class Recommendation(models.Model):
 
     room_id_rec = models.ForeignKey(Room, related_name='room_recom', on_delete=models.CASCADE, null=False)
