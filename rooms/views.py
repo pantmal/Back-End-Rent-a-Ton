@@ -138,6 +138,7 @@ class RecommendationViewSet(viewsets.ModelViewSet):
             permission_classes = [AllowAny]
         if self.action == 'create' or self.action == 'update' or self.action == 'partial_update' or self.action == 'destroy':
             permission_classes = [IsRenterUser]
+        return [permission() for permission in permission_classes]
         #permission_classes = [AllowAny]
         #return [permission() for permission in permission_classes]        
 

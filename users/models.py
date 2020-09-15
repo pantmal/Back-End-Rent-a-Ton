@@ -27,4 +27,4 @@ class Message(models.Model):
     receiver_name = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
     content = models.TextField(max_length=7000, null=False)
-    date = models.DateField(null=False)    
+    date = models.DateTimeField(null=False)    
