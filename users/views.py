@@ -100,7 +100,7 @@ class GetMessages(APIView):
             else:
                 return Response('not found')
 
-#Changing the aprroved status of a host.
+#Changing the approved status of a host.
 class approveUser(APIView):
 
     #Used only by admins.

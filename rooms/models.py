@@ -63,7 +63,7 @@ class RoomRating(models.Model):
     room_id_rate = models.ForeignKey(Room, related_name='room_rate', on_delete=models.CASCADE, null=False)
     renter_id_rate = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_rate', on_delete=models.CASCADE, null=False)
     date = models.DateField(null=False)
-    rating = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    rating = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(5.0)])
     secondary_id = models.IntegerField()
 
 #Defining the Host Rating model.
@@ -72,7 +72,7 @@ class HostRating(models.Model):
     host_id_hostRate = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='host_hostRate', on_delete=models.CASCADE, null=False)
     renter_id_hostRate = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='renter_hostRate', on_delete=models.CASCADE, null=False)
     date = models.DateField(null=False)
-    rating = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
+    rating = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(5.0)])
 
 #Defining the Reservation model.
 class Reservation(models.Model):

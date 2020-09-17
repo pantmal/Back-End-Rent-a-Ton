@@ -303,7 +303,7 @@ class SearchRooms(APIView):
         
         #Adding the final rooms in an array.
         rooms_to_return = final_rooms
-        print(rooms_to_return)
+        #print(rooms_to_return)
         
         #Returning rooms using the serializer.
         if not rooms_to_return:
@@ -434,8 +434,8 @@ class RatingCount(APIView):
             count = len(RoomRating.objects.filter(room_id_rate=room_id))
             avg = RoomRating.objects.filter(room_id_rate=room_id).aggregate(Avg('rating'))
 
-            print(count)
-            print(avg)
+            #print(count)
+            #print(avg)
 
             return Response({'count':count,'avg':avg})
 
@@ -446,8 +446,8 @@ class RatingCount(APIView):
             count = len(HostRating.objects.filter(host_id_hostRate=host_id))
             avg = HostRating.objects.filter(host_id_hostRate=host_id).aggregate(Avg('rating'))
 
-            print(count)
-            print(avg)
+            #print(count)
+            #print(avg)
 
             return Response({'count':count,'avg':avg})
 

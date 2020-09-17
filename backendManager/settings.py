@@ -155,14 +155,15 @@ REST_FRAMEWORK = {
 REST_USE_JWT = True
 
 #Specifying settings for the JSON web tokens.
-#CHANGE SOME STUFF HERE
 JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'mysite.utils.my_jwt_response_handler',
     'JWT_VERIFY': True,
     'JWT_VERIFY_EXPIRATION': True,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=48),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=2),
     'JWT_ALLOW_REFRESH': True,
-    'JWT_AUTH_HEADER_PREFIX': 'JWT'
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+    'JWT_AUTH_COOKIE': None,
 }
 
 #Used so we can use settings in other Python scripts.

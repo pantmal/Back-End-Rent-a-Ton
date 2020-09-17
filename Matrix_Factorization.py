@@ -74,14 +74,14 @@ df = pd.DataFrame(list(Room.objects.all().values()))
 df = df.sort_values(by=['id'])
 df = df.tail(200)
 id_list = df['id'].tolist()
-print(len(id_list))
+#print(len(id_list))
 
 #Getting the last 200 users too.
 us_df = pd.DataFrame(list(users.values()))
 us_df = us_df.sort_values(by=['id'])
 us_df = us_df.tail(200)
 id_list_users = us_df['id'].tolist()
-print(len(id_list_users))
+#print(len(id_list_users))
 
 #Initializing an empty 'R' array.
 Real_Items = [['' for i in range(len(id_list))] for j in range(len(id_list_users))]
@@ -139,9 +139,7 @@ nP, nQ, e = Matrix_Factorization(R, P, Q, K)
 #Getting the final predicted array.
 nR = numpy.dot(nP, nQ)
 
-print(nR)
-#ADD A MESSAGE FOR e
-print(e)
+#print(nR)
 
 #Converting the predicted array from numpy to list format.
 new_array = nR.tolist()
@@ -160,7 +158,7 @@ final_preds = []
 for pred_list in preds:
     final_preds.append(sorted(pred_list, key=lambda x: float(x[0]),reverse=True))
 
-print(final_preds)
+#print(final_preds)
 
 #Creating a recommendation for each prediction.
 for pred_list in final_preds:
@@ -192,3 +190,6 @@ for pred_list in final_preds:
             if top == 10:
                 break
     
+
+#ADD A MESSAGE FOR e
+print(e)    

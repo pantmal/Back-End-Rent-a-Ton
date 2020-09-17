@@ -6,7 +6,6 @@ from textblob import TextBlob
 import nltk
  
 
-
 #downloading necessery toolkits
 nltk.download("wordnet")
 nltk.download("brown")
@@ -72,16 +71,10 @@ for row in range(0,len(df_listings)):
     if   'events' in df_listings.loc[row]['description']:
         df_listings.at[row,'events']=True
 
-        
-
-
-        
+                
 #replace NaN values with 0.0 -transit gets filled with null
 df_listings.fillna(df_listings.dtypes.replace({'float64': 0.0, 'O': 'NULL'}), inplace=True)        
         
-    
-
-
 #calculate max of some columns to fill the missing data
 square_feet_value=df_listings['square_feet'].max()
 bathrooms_value=df_listings['bathrooms'].max()
@@ -95,8 +88,7 @@ transit_list=df_listings['transit'].unique()
 transit_list_len=len(transit_list)
 
 
-
-#chagne 0 values to sth useful
+#change 0 values to sth useful
 #also fill in the neighbourhood and transit columns
 for row in range(0,len(df_listings)):
     if df_listings.loc[row,'square_feet']==0:
