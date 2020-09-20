@@ -21,45 +21,43 @@ from operator import itemgetter
 
 #Defining the Matrix Factorization function.
 #Steps are how many times the algorithm will re-run.
-#Alpha is the learning rate and beta is the normalization factor
+#Alpha is the learning rate and beta is the normalization factor.
 def Matrix_Factorization(R, P, Q, K, steps=1000, alpha=0.02, beta=0.02, gamma=0.05):
-    #Q = Q.T
-    #print(range(len(R)))
-
+    
     #Executing the algorithm for 'steps' times.
-    for step in pb.progressbar(range(steps)):
+    for step in range(steps):
         for i in range(len(R)): #i in this case is the row number
             for j in range(len(R[i])): #j in this case is the column number
                 if R[i][j] > 0: #For values in R that are not unknown
                     
-                    #eij is the error variable that is calculated by taking the difference between value in the real matrix and the corresponding value in the predicted P*Q array.
-                    eij = R[i][j] - numpy.dot(P[i,:],Q[:,j])
+                    #curr_error is the error variable that is calculated by taking the difference between value in the real matrix and the corresponding value in the predicted P*Q array.
+                    predicted_array_temp = numpy.dot(P[i,:],Q[:,j])
+                    curr_error = R[i][j] - predicted_array_temp
 
                     #Updating values in P and Q using K latent features.
                     #The idea for gradient descent formula used for the updating was inspired from the following link: http://proceedings.mlr.press/v36/li14.pdf
                     for k in range(K):
-                        P[i][k] = P[i][k] + alpha * ( eij * Q[k][j] - beta * P[i][k])
-                        Q[k][j] = Q[k][j] + alpha * ( eij * P[i][k] - beta * Q[k][j])
+                        P[i][k] = P[i][k] + alpha * ( curr_error * Q[k][j] - beta * P[i][k])
+                        Q[k][j] = Q[k][j] + alpha * ( curr_error * P[i][k] - beta * Q[k][j])
 
-        #Now we create the updated predicted array with updated values of P and Q.
-        eR = numpy.dot(P,Q)
-        
-        #Here we calculate the Mean Squared Error and save it in e, to evaluate the accuracy of the algorithm.
+
+        #Here we calculate the Mean Squared Error and save it in 'error', to evaluate the accuracy of the algorithm.
         #Ideas for the calculation of the Mean Squared Error used by: https://www.diva-portal.org/smash/get/diva2:927190/FULLTEXT01.pdf
-        e = 0
+        error = 0
         for i in range(len(R)):
             for j in range(len(R[i])):
                 if R[i][j] > 0:
-                    e = e + pow(R[i][j] - numpy.dot(P[i,:],Q[:,j]), 2)
+                    power_err = pow(R[i][j] - numpy.dot(P[i,:],Q[:,j]), 2)
+                    error = error + power_err
                     for k in range(K):
-                        e = e + (beta) * (pow(P[i][k],2) + pow(Q[k][j],2))/2
+                        error = error + (beta) * (pow(P[i][k],2) + pow(Q[k][j],2))/2
         
-        #Setting a boundary for e. We may want to stop the execution of the algorithm if it the value of e is good enough.
-        if e < 0.001:
+        #Setting a boundary for error. We may want to stop the execution of the algorithm if it the value of the error is good enough.
+        if error < 0.01:
             break
 
     #Returning the final versions of P and Q and the Mean Squared Error.
-    return P, Q, e
+    return P, Q, error
 
 
 #Getting rooms and users
@@ -72,14 +70,14 @@ users = users.filter(is_renter=True)
 #For this example we used the last 200 rooms.
 df = pd.DataFrame(list(Room.objects.all().values()))
 df = df.sort_values(by=['id'])
-df = df.tail(200)
+df = df.head(200)
 id_list = df['id'].tolist()
 #print(len(id_list))
 
 #Getting the last 200 users too.
 us_df = pd.DataFrame(list(users.values()))
 us_df = us_df.sort_values(by=['id'])
-us_df = us_df.tail(200)
+us_df = us_df.head(200)
 id_list_users = us_df['id'].tolist()
 #print(len(id_list_users))
 
@@ -134,15 +132,15 @@ Q = numpy.random.rand(K,N)
 #print(Q)
 
 #Executing the Matrix Factorization algorithm.
-nP, nQ, e = Matrix_Factorization(R, P, Q, K)
+new_P, new_Q, error = Matrix_Factorization(R, P, Q, K)
 
 #Getting the final predicted array.
-nR = numpy.dot(nP, nQ)
+new_R = numpy.dot(new_P, new_Q)
 
-#print(nR)
+#print(new_R)
 
 #Converting the predicted array from numpy to list format.
-new_array = nR.tolist()
+new_array = new_R.tolist()
 
 #Getting values that were predicted.
 preds = []
@@ -191,5 +189,5 @@ for pred_list in final_preds:
                 break
     
 
-#ADD A MESSAGE FOR e
-print(e)    
+#Printing a message when the Matrix Factorization completes.
+print('Matrix Factorization algorithm completed with a Mean Squared error of: ',error)    
