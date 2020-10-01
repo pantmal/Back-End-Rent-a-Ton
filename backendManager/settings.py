@@ -89,11 +89,11 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'new_db',
         'USER': 'pantmal',
-        'PASSWORD': 'pantelis1998hunter23', #Hiding my password for obvious reasons. Remember you will have to specify your own settings if you want to use the application.
+        'PASSWORD': '********************', #Hiding my password for obvious reasons. Remember you will have to specify your own settings if you want to use the application.
         'HOST': '127.0.0.1',
         'POST': '5432'
         
-        #********************
+        
     }
 }
 
